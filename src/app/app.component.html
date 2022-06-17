@@ -1,0 +1,12 @@
+<div class="container noselect">
+  <div class="canvas-container">
+    <canvas style="border:1px solid #000000;" #canvas></canvas>
+  </div>
+  <div class="zone">
+    <ngx-joystick #staticJoystic
+      (start)="onStartStatic($event)"
+      (end)="onEndStatic($event)"
+      (move)="onMoveStatic($event)">
+    </ngx-joystick>
+  </div>
+</div>
