@@ -11,14 +11,18 @@
 
 .zone {
     position: relative;
-    border: 4px solid #003;
     width: 35vw;
     height: 35vw;
     margin: 5vw;
     margin-top: 10vw;
     left: 0;
+}
+
+.reset-button, .zone {
+    border: 4px solid #003;
     border-radius: 3vw;
     background-color: #def;
+    color: black;
 }
 
 .noselect {

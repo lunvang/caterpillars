@@ -2,13 +2,14 @@ import { JoystickEvent } from 'ngx-joystick';
 import { JoystickOutputData, JoystickManagerOptions } from '../../../node_modules/ngx-joystick/node_modules/nipplejs/types/index.d';
 
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { DataService } from '../services/data.service';
 
 @Component({
-  selector: 'app-circles',
-  templateUrl: './circles.component.html',
-  styleUrls: ['./circles.component.scss']
+  selector: 'app-radar',
+  templateUrl: './radar.component.html',
+  styleUrls: ['./radar.component.scss']
 })
-export class CirclesComponent implements OnInit, AfterViewInit {
+export class RadarComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasRef: ElementRef;
 
   joystickRadius: number = 50; // pixels
@@ -34,19 +35,24 @@ export class CirclesComponent implements OnInit, AfterViewInit {
   ];
 
   private spooderSize = 20;
-  private speed = 2;
+  private speed = 10;
+
+  private currentCircle: number = 1;
+
+  private inactiveTicks = 0;
+
+  private inactiveTickTimeout = 1800;
+
+  constructor(private dataService: DataService) {}
 
   get context() {
     return this.canvasRef.nativeElement.getContext("2d");
   }
 
-  constructor(
-  ) {}
-
   ngOnInit() {
     setInterval(() => {
       this.gameTick(); 
-      }, 20);
+      }, 100);
   }
 
   ngAfterViewInit(): void {
@@ -62,6 +68,7 @@ export class CirclesComponent implements OnInit, AfterViewInit {
 
   onMoveStatic(event: JoystickEvent, index: number) {
     this.staticOutputDatas[index] = event.data;
+    this.currentCircle = index;
   }
 
   moveStrength(index: number): number {
@@ -81,17 +88,25 @@ export class CirclesComponent implements OnInit, AfterViewInit {
   gameTick() {
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    [0, 1].forEach((index: number) => {
-      // detect spooder movement
-      let xMovement = this.moveStrength(index) * this.speed * this.directionVector(index).x;
-      let yMovement = this.moveStrength(index) * this.speed * this.directionVector(index).y;
+    // detect spooder movement
+    let xMovement = this.moveStrength(this.currentCircle) * this.speed * this.directionVector(this.currentCircle).x;
+    let yMovement = this.moveStrength(this.currentCircle) * this.speed * this.directionVector(this.currentCircle).y;
   
-      // update spooder location
-      this.spooderLocations[index] = {
-        x: this.spooderLocations[index].x + xMovement,
-        y: this.spooderLocations[index].y + yMovement
-      }
+    if (xMovement === 0 && yMovement === 0) {
+      this.inactiveTicks += 1;
+    }
+    else {
+      this.inactiveTicks = 0;
+    }
 
+
+    // update spooder location
+    this.spooderLocations[this.currentCircle] = {
+      x: this.spooderLocations[this.currentCircle].x + xMovement,
+      y: this.spooderLocations[this.currentCircle].y + yMovement
+    };
+
+    [0, 1].forEach((index: number) => {
       // draw spooder
       this.context.beginPath();
       this.context.arc(this.spooderLocations[index].x, -this.spooderLocations[index].y, this.spooderSize, 0, 2 * Math.PI);
@@ -101,6 +116,27 @@ export class CirclesComponent implements OnInit, AfterViewInit {
       this.context.strokeStyle = index===0 ? '#006' : '#310';
       this.context.stroke();
     });
+    
+    if (this.inactiveTicks < this.inactiveTickTimeout) {
+      this.dataService.wasReset().subscribe(
+        (response: boolean) => {
+          if (response === true) {
+            this.resetGame();
+          }
+        },
+        (error) => console.log(error)
+      );
+    }
+  }
 
+  onReset() {
+    this.dataService.resetGame();
+  }
+
+  resetGame() {
+    this.spooderLocations = [
+      {x: this.canvasWidth / 2 - 60, y: -this.canvasHeight / 2},
+      {x: this.canvasWidth / 2 + 60, y: -this.canvasHeight / 2}
+    ];
   }
 }
