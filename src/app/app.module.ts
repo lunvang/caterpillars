@@ -4,10 +4,16 @@ import { NgxJoystickModule } from 'ngx-joystick';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { HeaderComponent } from './header/header.component';
+import { CircleComponent } from './circle/circle.component';
+import { CirclesComponent } from './circles/circles.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HeaderComponent,
+    CircleComponent,
+    CirclesComponent
   ],
   imports: [
     BrowserModule,

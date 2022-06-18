@@ -1,0 +1,26 @@
+<h3 class="title">Move the Circles!</h3>
+
+<div class="container noselect">
+    <div class="canvas-container">
+      <canvas #canvas></canvas>
+    </div>
+</div>
+  
+<div class="container" style="align-items: center;">
+    <div class="row">
+        <div class="zone">
+            <ngx-joystick #staticJoystic
+                (end)="onEndStatic(0)"
+                (move)="onMoveStatic($event, 0)"
+                [options]="joystickOptions1">
+            </ngx-joystick>
+        </div>
+        <div class="zone">
+            <ngx-joystick #staticJoystic
+                (end)="onEndStatic(1)"
+                (move)="onMoveStatic($event, 1)"
+                [options]="joystickOptions2">
+            </ngx-joystick>
+        </div>
+    </div>
+</div>

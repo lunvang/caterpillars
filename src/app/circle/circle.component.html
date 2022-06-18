@@ -1,0 +1,17 @@
+<div class="container noselect">
+    <div class="canvas-container">
+      <canvas style="border:1px solid #000000;" #canvas></canvas>
+    </div>
+  </div>
+  
+  <div class="container" style="align-items: center;">
+    <div class="row">
+      <div class="zone">
+        <ngx-joystick
+          (move)="onMove($event)"
+          (end)="onEndMove()"
+          [options]="joystickOptions">
+        </ngx-joystick>
+      </div>
+    </div>
+  </div>
